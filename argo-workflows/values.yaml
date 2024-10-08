@@ -1,0 +1,59 @@
+argo-workflows:
+  server:
+    secure: false
+    authModes: ["server"]
+
+  controller:
+    podGCDeleteDelayDuration: "300s"
+    workflowNamespaces:
+      - argo
+
+    workflowDefaults:
+      spec:
+        serviceAccountName: argo-workflow
+        artifactRepositoryRef:
+          configMap: artifact-repositories
+          key: artifact-repository
+
+    persistence:
+      connectionPool:
+        maxIdleConns: 100
+        maxOpenConns: 0
+      nodeStatusOffLoad: true
+      archive: true
+      postgresql:
+        port: 5432
+        database: argodb
+        tableName: argotable
+        userNameSecret:
+          name: argo-postgres-config
+          key: username
+        passwordSecret:
+          name: argo-postgres-config
+          key: password
+        ssl: true
+        sslMode: require
+
+  artifactRepository:
+    archiveLogs: true
+    azure:
+      container: artifacts
+      blobNameFormat: |-
+        {{`{{workflow.name}}/{{pod.name}}`}}
+      accountKeySecret:
+        name: argo-storageaccount
+        key: secret
+
+  artifactRepositoryRef:
+    artifact-repositories:
+      annotations:
+        workflows.argoproj.io/default-artifact-repository: artifact-repository
+      artifact-repository:
+        archiveLogs: true
+        azure:
+          container: artifacts
+          blobNameFormat: |-
+            {{workflow.name}}/{{pod.name}}
+          accountKeySecret:
+            name: argo-storageaccount
+            key: secret

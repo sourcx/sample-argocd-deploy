@@ -1,0 +1,28 @@
+namespace: argo
+
+postgres:
+  encryptedUsername: encrytped-value-here
+  encryptedPassword: encrytped-value-here
+
+storageAccount:
+  secret: encrytped-value-here
+
+argo-workflows:
+  controller:
+    persistence:
+      postgresql:
+        host: sample-argocd-deploy.postgres.database.azure.com
+  server:
+    baseHref: /argo/
+
+  artifactRepository:
+    azure:
+      endpoint: https://sample-argocd-deploy.blob.core.windows.net
+
+  artifactRepositoryRef:
+    artifact-repositories:
+      artifact-repository:
+        azure:
+          endpoint: https://sample-argocd-deploy.blob.core.windows.net
+
+imagePullSecret: encrytped-value-here
