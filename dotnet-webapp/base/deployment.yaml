@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  labels:
+    app: webapp
+  annotations:
+    co.elastic.logs/multiline.pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z'
+    co.elastic.logs/multiline.negate: true
+    co.elastic.logs/multiline.match: after
+spec:
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      serviceAccountName: webapp-sa
+      containers:
+        - name: webapp
+          image: webapp
+          imagePullPolicy: Always
+          workingDir: /opt/app/
+          command: ["dotnet", Webapp.dll"]
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            failureThreshold: 10
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+          volumeMounts:
+            - name: secret-appsettings
+              mountPath: /opt/app/secrets
+              readOnly: true
+      volumes:
+        - name: secret-appsettings
+          secret:
+            secretName: secret-appsettings
