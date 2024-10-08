@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-proxy
+  labels:
+    app: postgres-proxy
+spec:
+  selector:
+    matchLabels:
+      app: postgres-proxy
+  template:
+    metadata:
+      labels:
+        app: postgres-proxy
+    spec:
+      containers:
+        - name: postgres-proxy
+          image: alpine/socat
+          command: ["echo", "use-overlays"]

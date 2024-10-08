@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-proxy
+spec:
+  template:
+    spec:
+      containers:
+        - name: postgres-proxy
+          command:
+            [
+              "socat",
+              "TCP-LISTEN:5432,fork,reuseaddr",
+              "TCP:pg-database-prod.postgres.database.azure.com:5432",
+            ]
